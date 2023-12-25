@@ -1,10 +1,11 @@
 import streamlit as st
 from txtai.pipeline import Summary, Textractor
-from pyPDF2 import PdfReader
+# import pyPDF2
+from PyPDF2 import PdfReader
 
 st.set_page_config(layout="wide")
 
-@st.cache_resource
+# @st.cache_resource
 
 def text_summary(text, maxlength=None):
     #create summary instance
