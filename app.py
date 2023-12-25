@@ -1,11 +1,12 @@
 import streamlit as st
 from txtai.pipeline import Summary, Textractor
-# import pyPDF2
 from PyPDF2 import PdfReader
 
-st.set_page_config(layout="wide")
+# Web Scraping Pkg
+from bs4 import BeautifulSoup
+from urllib.request import urlopen
 
-# @st.cache_resource
+st.set_page_config(layout="wide")
 
 def text_summary(text, maxlength=None):
     #create summary instance
@@ -21,6 +22,12 @@ def extract_text_from_pdf(file_path):
         page = reader.pages[0]
         text = page.extract_text()
     return text
+
+def get_text(url):
+	page = urlopen(url)
+	soup = BeautifulSoup(page)
+	fetched_text = ' '.join(map(lambda p:p.text,soup.find_all('p')))
+	return fetched_text
 
 choice = st.sidebar.selectbox("Select your choice", ["Summarize Text", "Summarize Document"])
 
@@ -58,3 +65,4 @@ elif choice == "Summarize Document":
                 text = extract_text_from_pdf("doc_file.pdf")
                 doc_summary = text_summary(text)
                 st.success(doc_summary)
+
