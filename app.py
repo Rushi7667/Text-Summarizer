@@ -1,6 +1,7 @@
 import streamlit as st
 from txtai.pipeline import Summary, Textractor
 from PyPDF2 import PdfReader
+from webpage_summarizer import summarize_url
 
 # Web Scraping Pkg
 from bs4 import BeautifulSoup
@@ -12,7 +13,7 @@ def text_summary(text, maxlength=None):
     #create summary instance
     summary = Summary()
     text = (text)
-    result = summary(text)
+    result = summary(text,maxlength=150)
     return result
 
 def extract_text_from_pdf(file_path):
@@ -23,13 +24,14 @@ def extract_text_from_pdf(file_path):
         text = page.extract_text()
     return text
 
+# getting text from url
 def get_text(url):
 	page = urlopen(url)
 	soup = BeautifulSoup(page)
 	fetched_text = ' '.join(map(lambda p:p.text,soup.find_all('p')))
 	return fetched_text
 
-choice = st.sidebar.selectbox("Select your choice", ["Summarize Text", "Summarize Document"])
+choice = st.sidebar.selectbox("Select your choice", ["Summarize Text", "Summarize Document", "Summarize url"])
 
 if choice == "Summarize Text":
     st.subheader("Summarize Text")
@@ -66,3 +68,25 @@ elif choice == "Summarize Document":
                 doc_summary = text_summary(text)
                 st.success(doc_summary)
 
+elif choice == "Summarize url":
+    st.subheader("Summarize url")
+
+    # Input: URL
+    url = st.text_input("Enter the URL of the webpage:")
+
+    # Input: Number of Sentences for Summary
+    sentences_count = st.slider("Select the number of sentences for the summary:", 1, 10, 3)
+
+    if st.button("Summarize"):
+        if url:
+            st.write("Summarizing... Please wait.")
+            try:
+                summary = summarize_url(url, sentences_count)
+                st.subheader("Summary:")
+                st.write(summary)
+
+            except Exception as e:
+                st.error(f"Error during summarization: {e}")
+
+        else:
+            st.warning("Please enter a valid URL.")
